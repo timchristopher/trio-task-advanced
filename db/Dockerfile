@@ -4,8 +4,8 @@ FROM mysql:5.7
 
 # Add a database and root password
 # For hints on how to do this, consult the mysql 5.7 image documentation
-ENV MYSQL_DATABASE=db
-ENV MYSQL_USER=user
+ENV MYSQL_DATABASE=flask-db
+ENV MYSQL_USER=root
 ENV MYSQL_PASSWORD=password
 ENV MYSQL_ROOT_PASSWORD=password
 
@@ -13,3 +13,5 @@ ENV MYSQL_ROOT_PASSWORD=password
 # All scripts copied to docker-entrypoint-initdb.d/ are automatically
 # executed during container startup
 COPY . docker-entrypoint-initdb.d/
+
+EXPOSE 3306

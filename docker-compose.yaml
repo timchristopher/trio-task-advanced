@@ -11,7 +11,7 @@ services:
     build: ./flask-app/
     container_name: flask-app
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - mysql
   trio-nginx:

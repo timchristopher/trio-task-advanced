@@ -17,8 +17,10 @@ pipeline {
                 declare -a arr=("mysql" "flask-app" "trio-nginx")
                 for i in "${arr[@]}"
                 do
-                    docker ps -q --filter "name=^$i\$" | grep -q . && echo "Stopping $i" && docker stop $i || echo "$i not running"
-                    docker ps -qa --filter "name=^$i\$" | grep -q . && echo "Removing $i container" && docker rm $i || echo "Container named '$i' does not exist"
+                    echo "Clean-up: $i"
+                    docker ps -q --filter "name=^$i\$" | grep -q . && docker stop $i | (echo -n "Stopped " && cat) || echo "$i not running"
+                    docker ps -qa --filter "name=^$i\$" | grep -q . && docker rm $i | (echo -n "Removed container " && cat) || echo "Container named '$i' does not exist"
+                    echo
                 done
                 unset arr
                 '''

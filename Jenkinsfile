@@ -13,7 +13,7 @@ pipeline {
                 echo 'Clean-up'
                 // sh 'docker system prune -f'
                 sh '''
-                declare -a arr=("mysql" "flask-app" "nginx-trio")
+                declare -a arr="mysql" "flask-app" "nginx-trio"
                 for i in "${arr[@]}"
                 do
                     docker ps -q --filter "name=^$i\$" | grep -q . && echo "Stopping $i" && docker stop $i || echo "$i not running"

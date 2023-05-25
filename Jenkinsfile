@@ -32,7 +32,6 @@ pipeline {
                 cd ..
                 
                 cd nginx
-                docker build -t trio-nginx:v1 .
                 docker run -d --network trio-net --name trio-nginx -p 80:80 --mount type=bind,source=$(pwd)/nginx.conf,target=/etc/nginx/nginx.conf  nginx:alpine
                 cd ..
                 '''

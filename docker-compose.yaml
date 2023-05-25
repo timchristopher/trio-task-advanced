@@ -3,17 +3,20 @@ services:
   mysql:
     image: trio-db
     build: ./db/
+    container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
   flask-app:
     image: trio-app
     build: ./flask-app/
+    container_name: flask-app
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     depends_on:
       - mysql
   trio-nginx:
     image: nginx:alpine
+    container_name: trio-nginx
     volumes:
       - ./nginx-conf:/etc/nginx/nginx.conf
     ports:

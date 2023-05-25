@@ -5,6 +5,7 @@ services:
     build: ./db/
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=flask-db
   flask-app:
     image: trio-app
     build: ./flask-app/

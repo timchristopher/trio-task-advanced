@@ -4,14 +4,14 @@ services:
     build: ./db/
     image: trio-db:v2
     environment:
-      - MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     networks:
       - trio-net
   flask-app:
     build: ./flask-app/
     image: trio-app:v2
     environment:
-      - DB_PASSWORD: ${DB_PASSWORD}
+      - DB_PASSWORD=${DB_PASSWORD}
     networks:
       - trio-net
     depends_on:

@@ -12,9 +12,14 @@ pipeline {
             steps {
                 echo 'Clean-up'
                 // sh 'docker system prune -f'
-                sh 'docker stop mysql && docker rm mysql || docker rm mysql'
-                sh 'docker stop flask-app && docker rm flask-app || docker rm flask-app'
-                sh 'docker stop trio-nginx && docker rm trio-nginx || docker rm trio-nginx'
+                // sh 'docker stop mysql && docker rm mysql || docker rm mysql'
+                // sh 'docker stop flask-app && docker rm flask-app || docker rm flask-app'
+                // sh 'docker stop trio-nginx && docker rm trio-nginx || docker rm trio-nginx'
+                sh '''
+                docker ps -q --filter "name=mysql" | grep -q . && docker stop mysql && docker rm mysql || echo 'mysql not running'
+                docker ps -q --filter "name=flask-app" | grep -q . && docker stop flask-app && docker rm flask-app || echo 'flask-app not running'
+                docker ps -q --filter "name=trio-nginx" | grep -q . && docker stop trio-nginx && docker rm trio-nginx || echo 'trio-nginx not running'
+                '''
             }
         }
         stage('Build and Run') {

@@ -7,6 +7,10 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     networks:
       - trio-net
+    volumes:
+      - type: volume
+        source: trio-vol
+        target: /var/lib/mysql
   flask-app:
     build: ./flask-app/
     image: trio-app:v2
@@ -32,4 +36,5 @@ services:
       - flask-app
 networks:
   trio-net:
-    
+volumes:
+  trio-vol:

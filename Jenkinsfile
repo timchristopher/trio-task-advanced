@@ -13,6 +13,7 @@ pipeline {
                 echo 'Clean-up'
                 // sh 'docker system prune -f'
                 sh '''
+                #!/bin/bash
                 declare -a arr="mysql" "flask-app" "nginx-trio"
                 for i in "${arr[@]}"
                 do

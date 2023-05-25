@@ -12,7 +12,9 @@ pipeline {
             steps {
                 echo 'Clean-up'
                 // sh 'docker system prune -f'
-                sh 'docker stop duo-task && docker rm duo-task || docker rm duo-task'
+                sh 'docker stop mysql && docker rm mysql || docker rm mysql'
+                sh 'docker stop flask-app && docker rm flask-app || docker rm flask-app'
+                sh 'docker stop trio-nginx'
             }
         }
         stage('Build and Run') {

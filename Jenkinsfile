@@ -1,6 +1,10 @@
 pipeline {
     agent any
    
+    parameters {
+        booleanParam(name: 'skip_run', defaultValue: true, description: 'Set to false to run the application')
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
@@ -43,23 +47,16 @@ pipeline {
             }
         }
         stage('Run') {
+            when { expression { params.skip_run != true } }
             steps {
-                input message: 'Want to skip the Run stage?', ok: 'Yes',
-                  parameters: [booleanParam(name: 'skip_run', defaultValue: true)], timeout: time(minutes: 1))
+                echo 'Run'
+                sh '''
+                docker network ls -q --filter "name=^trio-net\$" | grep -q . && echo "trio-net already exists" || docker network create trio-net
                 
-                script {
-                    if(params.skip_run) {
-                        echo 'Run'
-                        sh '''
-                        docker network ls -q --filter "name=^trio-net\$" | grep -q . && echo "trio-net already exists" || docker network create trio-net
-                
-                        docker run -d --network trio-net --name mysql trio-db:v1
-                        docker run -d --network trio-net --name flask-app trio-app:v1
-                        docker run -d --network trio-net --name trio-nginx -p 80:80 --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf  nginx:alpine
-                        '''
-                        return
-                    }
-                }
+                docker run -d --network trio-net --name mysql trio-db:v1
+                docker run -d --network trio-net --name flask-app trio-app:v1
+                docker run -d --network trio-net --name trio-nginx -p 80:80 --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf  nginx:alpine
+                '''
             }
         }
         stage('Test') {

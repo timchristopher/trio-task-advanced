@@ -28,25 +28,29 @@ pipeline {
                 '''
             }
         }
-        stage('Build and Run') {
+        stage('Build') {
             steps {
                 echo 'Build'
                 sh '''
-                docker network ls -q --filter "name=^trio-net\$" | grep -q . && echo "trio-net already exists" || docker network create trio-net
-                
                 cd db
                 docker build -t trio-db:v1 .
-                docker run -d --network trio-net --name mysql trio-db:v1
                 cd ..
                 
                 cd flask-app
                 docker build -t trio-app:v1 .
-                docker run -d --network trio-net --name flask-app trio-app:v1
                 cd ..
+                '''
+            }
+        }
+        stage('Run') {
+            steps {
+                echo 'Run'
+                sh '''
+                docker network ls -q --filter "name=^trio-net\$" | grep -q . && echo "trio-net already exists" || docker network create trio-net
                 
-                cd nginx
-                docker run -d --network trio-net --name trio-nginx -p 80:80 --mount type=bind,source=$(pwd)/nginx.conf,target=/etc/nginx/nginx.conf  nginx:alpine
-                cd ..
+                docker run -d --network trio-net --name mysql trio-db:v1
+                docker run -d --network trio-net --name flask-app trio-app:v1
+                docker run -d --network trio-net --name trio-nginx -p 80:80 --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf  nginx:alpine
                 '''
             }
         }

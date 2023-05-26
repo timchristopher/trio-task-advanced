@@ -23,6 +23,8 @@ pipeline {
                     echo
                 done
                 unset arr
+                
+                docker network ls -q --filter "name=^trio-net\$" | grep -q . && docker network rm trio-net || echo "trio-net does not exist"
                 '''
             }
         }
@@ -30,7 +32,7 @@ pipeline {
             steps {
                 echo 'Build'
                 sh '''
-                docker network inspect trio-net && sleep 1 || docker network create trio-net
+                docker network ls -q --filter "name=^trio-net\$" | grep -q . && echo "trio-net already exists" || docker network create trio-net
                 
                 cd db
                 docker build -t trio-db:v1 .
@@ -51,11 +53,6 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Test'
-            }
-        }
-        stage('Remote stage') {
-            steps {
-                echo 'Remote test'
             }
         }
     }

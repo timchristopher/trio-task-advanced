@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config #important
+data:
+  nginx.conf: |   # name of the file that will be mounted
+    events {}
+    http {
+        server {
+            listen 80;
+            location / {
+                proxy_pass "http://flask-app:5000";
+            }
+        }
+    }

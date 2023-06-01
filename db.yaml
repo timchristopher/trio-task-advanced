@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: db #do not name when using replicas
+  labels:
+    app: db #pair needs to match selector in service
+spec:
+  containers:
+    - name: db #required - can be anything
+      image: gcr.io/lbg-mea-11/trio-db:v2
+      ports:
+      - containerPort: 3306
+      env:
+      - name: MYSQL_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mysql-creds
+            key: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql #service name - referenced by dev code
+spec:
+  type: ClusterIP
+  selector:
+    app: db # must match metaname
+  ports:
+    - port: 3306
+      protocol: TCP
+

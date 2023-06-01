@@ -2,7 +2,7 @@ version: "3.8"
 services:
   mysql:
     build: ./db/
-    image: trio-db:v2
+    image: gcr.io/lbg-mea-11/trio-db:v2
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     networks:
@@ -13,7 +13,7 @@ services:
         target: /var/lib/mysql
   flask-app:
     build: ./flask-app/
-    image: trio-app:v2
+    image: gcr.io/lbg-mea-11/trio-app:v2
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
     networks:

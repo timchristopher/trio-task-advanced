@@ -22,8 +22,10 @@ pipeline {
             }
         }
         stage('Local clean-up') {
-            sh 'docker rmi gcr.io/lbg-mea-11/trio-db:v2'
-            sh 'docker rmi gcr.io/lbg-mea-11/trio-app:v2'
+            steps {
+                sh 'docker rmi gcr.io/lbg-mea-11/trio-db:v2'
+                sh 'docker rmi gcr.io/lbg-mea-11/trio-app:v2'
+            }
         }
         stage('Deploy to Cluster') {
             when { expression { params.skip_deploy != true } }
@@ -39,9 +41,13 @@ pipeline {
                 '''
             }
         }
-        stage('Test') {
+        stage('Wait for External IP') {
             steps {
-                echo 'Test'
+                sh '''#!/bin/bash
+                kubectl get svc
+                bash -c 'external_ip=""; while [ -z $external_ip ]; do echo "Waiting for end point..."; external_ip=$(kubectl get svc nginx --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}"); [ -z "$external_ip" ] && sleep 2; done; echo "End point ready-" && echo $external_ip; export endpoint=$external_ip'
+                kubectl describe svc nginx
+                '''
             }
         }
     }

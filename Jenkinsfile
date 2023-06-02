@@ -5,7 +5,7 @@ pipeline {
         PASSWORD = credentials('password')
     }
     parameters {
-        booleanParam(name: 'skip_deploy', defaultValue: false, description: 'Set to false to deploy the application')
+        booleanParam(name: 'stopService', defaultValue: false, description: 'Set to true to stop the application')
     }
 
     stages {
@@ -28,7 +28,6 @@ pipeline {
             }
         }
         stage('Deploy to Cluster') {
-            when { expression { params.skip_deploy != true } }
             steps {
                 echo 'Deploy to Cluster'
                 sh '''
@@ -47,6 +46,19 @@ pipeline {
                 kubectl get svc
                 bash -c 'external_ip=""; while [ -z $external_ip ]; do echo "Waiting for end point..."; external_ip=$(kubectl get svc nginx --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}"); [ -z "$external_ip" ] && sleep 2; done; echo "End point ready-" && echo $external_ip; export endpoint=$external_ip'
                 kubectl describe svc nginx
+                '''
+            }
+        }
+        stage('Stop the service') {
+            when { expression { params.stopService == true } }
+            steps {
+                echo 'Stop the service'
+                sh '''
+                kubectl delete -f nginx-pod.yaml
+                kubectl delete -f trio-deployment.yaml
+                kubectl delete -f db.yaml
+                kubectl delete -f nginx-config.yaml
+                sed -e 's,{{PASSWORD}},'${PASSWORD}',g;' mysql-credentials.yaml | kubectl delete -f -
                 '''
             }
         }
